@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counter</title>
+
+
+    <style>
+        /* Add some styling for the body element */
+        body {
+            background-color: #f1f1f1;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Style the page header */
+        .page-header {
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            color: #4CAF50;
+        }
+
+        /* Style the login container */
+        #login-container {
+            width: 400px;
+            background-color: #b3e5fc;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+            margin: 100px auto;
+            padding: 20px;
+            display: none;
+        }
+
+        #login-container.active {
+            display: block;
+        }
+
+        /* Style the form elements */
+        #login-container form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #login-container form label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        #login-container form input[type="text"],
+        #login-container form input[type="password"] {
+            width: 60%;
+            height: 35px;
+            margin: 5px 0;
+            padding: 0 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        #login-container form #login-button[type="button"] {
+            width: 20%;
+            height: 40px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 3px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        #login-container form #login-button[type="button"]:hover {
+            background-color: #45a049;
+        }
+
+        #login-container form #authentication-error {
+            color: red;
+            font-weight: bold;
+            visibility: hidden;
+        }
+
+        #login-container form #authentication-error.active {
+            visibility: visible;
+        }
+
+
+        /* Style the counter container */
+        #counter-container {
+            width: 400px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+            margin: 100px auto;
+            padding: 20px;
+            display: none;
+        }
+
+        #counter-container.active {
+            display: block;
+        }
+
+        #counter-container #logout-button[type="button"] {
+            border-radius: 50%;
+            background-color: #f44336;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+
+        }
+
+        /* Style the counter value */
+        #counter-container #counter-value {
+            font-size: 32px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        /* Style the counter actions */
+        #counter-container #counter-actions {
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Style the buttons */
+        #counter-container button {
+            width: 45px;
+            height: 45px;
+            border: none;
+            border-radius: 50%;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            font-size: 24px;
+            margin: 0 10px;
+        }
+
+        #counter-container button:hover {
+            background-color: #3e8e41;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div id="login-container" class="active">
+        <h1 class="page-header">HIT</h1>
+        <form>
+            <label for="username">Username:</label><br>
+            <input type="text" id="username" name="username"><br>
+            <label for="password">Password:</label><br>
+            <input type="password" id="password" name="password"><br><br>
+            <button id="login-button" type="button">Login</button>
+
+            <label id="authentication-error"></label>
+        </form>
+    </div>
+
+
+    <div id="counter-container">
+        <button id="logout-button" type="button">Out</button>
+        <h1 class="page-header">HIT</h1>
+        <!-- Display the counter value -->
+        <div id="counter-value">0</div>
+
+        <!-- Increment and decrement buttons -->
+        <div id="counter-actions">
+            <button id="increment-button">+</button>
+            <button id="decrement-button">-</button>
+        </div>
+    </div>
+
+    <script type="application/javascript">
+        const AUTH = {
+            username: "admin",
+            password: "admin"
+        };
+
+        const loginButton = document.getElementById("login-button");
+        const authenticationError = document.getElementById("authentication-error");
+        const incrementButton = document.getElementById('increment-button');
+        const decrementButton = document.getElementById('decrement-button');
+        const counterValue = document.getElementById('counter-value');
+        const logoutButton = document.getElementById('logout-button');
+
+        // Increment the counter value when the + button is clicked
+        incrementButton.addEventListener('click', () => {
+            counterValue.textContent = parseInt(counterValue.textContent) + 1;
+        });
+
+        // Decrement the counter value when the - button is clicked
+        decrementButton.addEventListener('click', () => {
+            counterValue.textContent = parseInt(counterValue.textContent) - 1;
+        });
+
+        // Logout the user when the logout button is clicked
+        logoutButton.addEventListener('click', () => {
+            switchToLoginPage();
+        });
+
+        loginButton.addEventListener("click", onLogin);
+
+        // Login the user when the login button is clicked
+        function onLogin() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            if (!isAuthenticationValid(username, password)) {
+                return onLoginError();
+            }
+
+            onLoginSuccess();
+        }
+
+        // Check if the username and password are valid
+        function isAuthenticationValid(username, password) {
+            return username === AUTH.username && password === AUTH.password;
+        }
+
+        // Show the counter page and hide the login page
+        function onLoginSuccess() {
+            authenticationError.classList.remove("active");
+            switchToCounterPage();
+        }
+
+        // Show the error message
+        function onLoginError() {
+            authenticationError.classList.add("active");
+            authenticationError.innerText = "Invalid username or password";
+        }
+
+        // Show the counter page and hide the login page
+        function switchToCounterPage() {
+            counterValue.textContent = 0;
+            document.getElementById("login-container").classList.remove("active");
+            document.getElementById("counter-container").classList.add("active");
+        }
+
+        // Show the login page and hide the counter page
+        function switchToLoginPage() {
+            document.getElementById("username").value = "";
+            document.getElementById("password").value = "";
+            document.getElementById("login-container").classList.add("active");
+            document.getElementById("counter-container").classList.remove("active");
+        }
+
+        // Reset the counter value and show the login page
+        function onLogout() {
+            switchToLoginPage();
+        }
+    </script>
+</body>
+
+</html>
