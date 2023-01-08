@@ -88,6 +88,7 @@
 
         /* Style the counter container */
         #counter-container {
+            position: relative;
             width: 400px;
             background-color: white;
             border-radius: 5px;
@@ -102,12 +103,27 @@
         }
 
         #counter-container #logout-button[type="button"] {
-            border-radius: 50%;
-            background-color: #f44336;
+            border: none;
+            border-radius: 100%;
+            background-color: #9c27b0;
             color: white;
             cursor: pointer;
             font-size: 14px;
+            height: 40px;
+            overflow: hidden;
+            width: 40px;
+            margin: 0;
+            box-shadow: 0 2px 5px 0 rgb(0 0 0 / 26%), 0 2px 10px 0 rgb(0 0 0 / 16%);
+            position: absolute;
+            top: -15px;
+            right: 0;
+            z-index: -1;
+            transition: all 0.3s ease-in-out;
+        }
 
+        #counter-container #logout-button[type="button"]:hover {
+            background-color: #8e24aa;
+            top: -40px;
         }
 
         /* Style the counter value */
@@ -124,7 +140,7 @@
         }
 
         /* Style the buttons */
-        #counter-container button {
+        #counter-container #counter-actions button {
             width: 45px;
             height: 45px;
             border: none;
@@ -136,7 +152,7 @@
             margin: 0 10px;
         }
 
-        #counter-container button:hover {
+        #counter-container #counter-actions button:hover {
             background-color: #3e8e41;
         }
     </style>
@@ -167,8 +183,8 @@
 
         <!-- Increment and decrement buttons -->
         <div id="counter-actions">
-            <button id="increment-button">+</button>
             <button id="decrement-button">-</button>
+            <button id="increment-button">+</button>
         </div>
     </div>
 
