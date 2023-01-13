@@ -189,83 +189,133 @@
     </div>
 
     <script type="application/javascript">
-        const AUTH = {
-            username: "admin",
-            password: "admin"
-        };
-
-        const loginButton = document.getElementById("login-button");
-        const authenticationError = document.getElementById("authentication-error");
-        const incrementButton = document.getElementById('increment-button');
-        const decrementButton = document.getElementById('decrement-button');
-        const counterValue = document.getElementById('counter-value');
-        const logoutButton = document.getElementById('logout-button');
-
-        // Increment the counter value when the + button is clicked
-        incrementButton.addEventListener('click', () => {
-            counterValue.textContent = parseInt(counterValue.textContent) + 1;
-        });
-
-        // Decrement the counter value when the - button is clicked
-        decrementButton.addEventListener('click', () => {
-            counterValue.textContent = parseInt(counterValue.textContent) - 1;
-        });
-
-        // Logout the user when the logout button is clicked
-        logoutButton.addEventListener('click', () => {
-            switchToLoginPage();
-        });
-
-        loginButton.addEventListener("click", onLogin);
-
-        // Login the user when the login button is clicked
-        function onLogin() {
-            const username = document.getElementById("username").value;
-            const password = document.getElementById("password").value;
-
-            if (!isAuthenticationValid(username, password)) {
-                return onLoginError();
+        class View {
+            constructor() {
+                this.loginButton = document.getElementById("login-button");
+                this.authenticationError = document.getElementById("authentication-error");
+                this.incrementButton = document.getElementById("increment-button");
+                this.decrementButton = document.getElementById("decrement-button");
+                this.counterValue = document.getElementById("counter-value");
+                this.logoutButton = document.getElementById("logout-button");
+                this.username = document.getElementById("username");
+                this.password = document.getElementById("password");
             }
 
-            onLoginSuccess();
+            getUserName() {
+                return this.username.value;
+            }
+
+            getPassword() {
+                return this.password.value;
+            }
+
+            switchToCounterPage() {
+                document.getElementById("login-container").classList.remove("active");
+                document.getElementById("counter-container").classList.add("active");
+            }
+
+            switchToLoginPage() {
+                this.username.value = "";
+                this.password.value = "";
+                this.authenticationError.classList.remove("active");
+                document.getElementById("login-container").classList.add("active");
+                document.getElementById("counter-container").classList.remove("active");
+            }
+
+            onLoginError(message) {
+                this.authenticationError.classList.add("active");
+                this.authenticationError.innerText = message;
+            }
+
+            onLoginSuccess() {
+                this.switchToCounterPage();
+            }
+
+            getCurrentCounterValue() {
+                return parseInt(this.counterValue.textContent);
+            }
+
+            setCounterValue(value) {
+                this.counterValue.textContent = value;
+            }
         }
 
-        // Check if the username and password are valid
-        function isAuthenticationValid(username, password) {
-            return username === AUTH.username && password === AUTH.password;
+        class UserSession {
+            state = {
+                counterValue: 0
+            }
+
+            constructor(username, password) {
+                this.username = username;
+                this.password = password;
+            }
+
+            isAuthenticationValid(username, password) {
+                return (
+                    username === this.username &&
+                    password === this.password
+                )
+            }
+            
+            setCounterValue(value) {
+                this.state.counterValue = value;
+            }
+
+            getCounterValue() {
+                return this.state.counterValue;
+            }
         }
 
-        // Show the counter page and hide the login page
-        function onLoginSuccess() {
-            authenticationError.classList.remove("active");
-            switchToCounterPage();
+        class Controller {
+            constructor(view, userSession) {
+                this.view = view;
+                this.userSession = userSession;
+                this.view.loginButton.addEventListener("click", this.onLogin.bind(this));
+                this.view.incrementButton.addEventListener("click", this.onIncrement.bind(this));
+                this.view.decrementButton.addEventListener("click", this.onDecrement.bind(this));
+                this.view.logoutButton.addEventListener("click", this.onLogout.bind(this));
+            }
+
+            onLogin() {
+                const username = this.view.getUserName();
+                const password = this.view.getPassword();
+
+                if (!this.userSession.isAuthenticationValid(username, password)) {
+                    return this.onLoginError();
+                }
+
+                this.onLoginSuccess();
+            }
+
+            onLoginSuccess() {
+                this.userSession.setCounterValue(0);
+                this.view.setCounterValue(this.userSession.getCounterValue());
+                this.view.switchToCounterPage();
+            }
+
+            onLoginError() {
+                this.view.onLoginError("Invalid username or password");
+            }
+
+            onIncrement() {
+                this.userSession.setCounterValue(this.userSession.getCounterValue() + 1);
+                this.view.setCounterValue(this.userSession.getCounterValue());
+            }
+
+            onDecrement() {
+                this.userSession.setCounterValue(this.userSession.getCounterValue() - 1);
+                this.view.setCounterValue(this.userSession.getCounterValue());
+            }
+
+            onLogout() {
+                this.view.switchToLoginPage();
+            }
         }
 
-        // Show the error message
-        function onLoginError() {
-            authenticationError.classList.add("active");
-            authenticationError.innerText = "Invalid username or password";
-        }
+        const view = new View();
+        const userSession = new UserSession("admin", "admin");
+        const controller = new Controller(view, userSession);
 
-        // Show the counter page and hide the login page
-        function switchToCounterPage() {
-            counterValue.textContent = 0;
-            document.getElementById("login-container").classList.remove("active");
-            document.getElementById("counter-container").classList.add("active");
-        }
-
-        // Show the login page and hide the counter page
-        function switchToLoginPage() {
-            document.getElementById("username").value = "";
-            document.getElementById("password").value = "";
-            document.getElementById("login-container").classList.add("active");
-            document.getElementById("counter-container").classList.remove("active");
-        }
-
-        // Reset the counter value and show the login page
-        function onLogout() {
-            switchToLoginPage();
-        }
     </script>
 </body>
 
