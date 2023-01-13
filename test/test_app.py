@@ -1,4 +1,5 @@
 import environment
+import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from driver_operations import (
@@ -7,6 +8,7 @@ from driver_operations import (
     is_counter_container_displayed,
     is_login_container_displayed,
     get_counter_value,
+    set_counter_value,
     increment_counter,
     decrement_counter,
     login,
@@ -25,11 +27,10 @@ driver = webdriver.Chrome(
 driver.get(environment.APP_URL)
 
 
-
 def test_login_with_invalid_credentials():
     login(driver, 'invalid_username', 'invalid_password')
-    # validates that the error message is displayed 
-    is_error_displayed =  is_authentication_error_message_displayed(driver)
+    # validates that the error message is displayed
+    is_error_displayed = is_authentication_error_message_displayed(driver)
     assert is_error_displayed == True
     # validates that the error message is correct
     error_message = grab_authentication_error_mesaage(driver)
@@ -41,7 +42,8 @@ def test_login_with_invalid_credentials():
 
 
 def test_login_with_valid_credentials():
-    login(driver, environment.AuthCredentials.username, environment.AuthCredentials.password)
+    login(driver, environment.AuthCredentials.username,
+          environment.AuthCredentials.password)
     # validates that the error message is not displayed
     is_error_displayed = is_authentication_error_message_displayed(driver)
     assert is_error_displayed == False
@@ -54,7 +56,8 @@ def test_login_with_valid_credentials():
 def test_logout():
     # if the counter container is not displayed, login
     if not is_counter_container_displayed(driver):
-        login(driver, environment.AuthCredentials.username, environment.AuthCredentials.password)
+        login(driver, environment.AuthCredentials.username,
+              environment.AuthCredentials.password)
         # after login, validates that the counter container is displayed
         assert is_counter_container_displayed(driver) == True
     # logout
@@ -65,52 +68,72 @@ def test_logout():
     assert is_login_container_displayed(driver) == True
 
 
+@pytest.mark.parametrize("counter_value", [0, 3, 7])
+def test_set_get_counter_value(counter_value: int):
+    # if the counter container is not displayed, login
+    if not is_counter_container_displayed(driver):
+        login(driver, environment.AuthCredentials.username,
+              environment.AuthCredentials.password)
+        # after login, validates that the counter container is displayed
+        assert is_counter_container_displayed(driver) == True
+    # set counter value to X
+    set_counter_value(driver, counter_value)
+    # validates that the counter value is X
+    counter_value = get_counter_value(driver)
+    assert counter_value == counter_value
+
+
 def user_session_decorator(test_function):
     def wrapper():
         # login if needed
         if not is_counter_container_displayed(driver):
-            login(driver, environment.AuthCredentials.username, environment.AuthCredentials.password)
-        test_function()
+            login(driver, environment.AuthCredentials.username,
+                  environment.AuthCredentials.password)
+
+        counter_value = get_counter_value(driver)
+
+        test_function(counter_value)
         # logout
         logout(driver)
     return wrapper
-    
-
-@user_session_decorator
-def test_counter_value_is_zero_on_login():
-    # validates that the counter value is 0
-    assert get_counter_value(driver) == 0
 
 
 @user_session_decorator
-def test_increment_counter():
+def test_counter_value_is_zero_on_login(counter_value):
+    # validates that the counter value is as expected
+    assert get_counter_value(driver) == counter_value
+
+
+@user_session_decorator
+def test_increment_counter(counter_value):
     # increment counter
     increment_counter(driver)
-    # validates that the counter value is 1
-    assert get_counter_value(driver) == 1
+    # validates that the counter value is incremented by 1
+    assert get_counter_value(driver) == counter_value + 1
 
 
 @user_session_decorator
-def test_decrement_counter():
+def test_decrement_counter(counter_value):
     # increment counter
     increment_counter(driver)
-    # validates that the counter value is 1
-    assert get_counter_value(driver) == 1
+    # validates that the counter value is incremented by 1
+    assert get_counter_value(driver) == counter_value + 1
     # decrement counter
     decrement_counter(driver)
-    # validates that the counter value is 0
-    assert get_counter_value(driver) == 0
+    # validates that the counter value is decremented by 1
+    assert get_counter_value(driver) == counter_value
 
 
 @user_session_decorator
-def test_counter_value_is_zero_after_logout():
+def test_counter_value_is_persisted_after_logout(counter_value):
     # increment counter
     increment_counter(driver)
-    # validates that the counter value is 1
-    assert get_counter_value(driver) == 1
+    # validates that the counter value is incremented by 1
+    assert get_counter_value(driver) == counter_value + 1
     # logout
     logout(driver)
     # login
-    login(driver, environment.AuthCredentials.username, environment.AuthCredentials.password)
-    # validates that the counter value is 0
-    assert get_counter_value(driver) == 0
+    login(driver, environment.AuthCredentials.username,
+          environment.AuthCredentials.password)
+    # validates that the counter value is persisted
+    assert get_counter_value(driver) == counter_value + 1

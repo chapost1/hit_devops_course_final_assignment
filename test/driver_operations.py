@@ -44,7 +44,8 @@ def login(driver, username, password):
 
 
 def is_counter_container_displayed(driver):
-    counter_container = driver.find_element(by=By.ID, value='counter-container')
+    counter_container = driver.find_element(
+        by=By.ID, value='counter-container')
     return counter_container.is_displayed()
 
 
@@ -63,6 +64,10 @@ def logout(driver):
 def get_counter_value(driver):
     counter_value = driver.find_element(by=By.ID, value='counter-value')
     return int(counter_value.text)
+
+
+def set_counter_value(driver, value):
+    driver.execute_script(f"userSession.setCounterValue({value});")
 
 
 def increment_counter(driver):

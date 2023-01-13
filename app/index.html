@@ -201,6 +201,22 @@
                 this.password = document.getElementById("password");
             }
 
+            subscribeToLoginEvent(handler) {
+                this.loginButton.addEventListener("click", handler);
+            }
+
+            subscribeToIncrementEvent(handler) {
+                this.incrementButton.addEventListener("click", handler);
+            }
+
+            subscribeToDecrementEvent(handler) {
+                this.decrementButton.addEventListener("click", handler);
+            }
+
+            subscribeToLogoutEvent(handler) {
+                this.logoutButton.addEventListener("click", handler);
+            }
+
             getUserName() {
                 return this.username.value;
             }
@@ -256,7 +272,7 @@
                     password === this.password
                 )
             }
-            
+
             setCounterValue(value) {
                 this.state.counterValue = value;
             }
@@ -270,10 +286,10 @@
             constructor(view, userSession) {
                 this.view = view;
                 this.userSession = userSession;
-                this.view.loginButton.addEventListener("click", this.onLogin.bind(this));
-                this.view.incrementButton.addEventListener("click", this.onIncrement.bind(this));
-                this.view.decrementButton.addEventListener("click", this.onDecrement.bind(this));
-                this.view.logoutButton.addEventListener("click", this.onLogout.bind(this));
+                this.view.subscribeToLoginEvent(this.onLogin.bind(this));
+                this.view.subscribeToIncrementEvent(this.onIncrement.bind(this));
+                this.view.subscribeToDecrementEvent(this.onDecrement.bind(this));
+                this.view.subscribeToLogoutEvent(this.onLogout.bind(this));
             }
 
             onLogin() {
@@ -288,7 +304,6 @@
             }
 
             onLoginSuccess() {
-                this.userSession.setCounterValue(0);
                 this.view.setCounterValue(this.userSession.getCounterValue());
                 this.view.switchToCounterPage();
             }
