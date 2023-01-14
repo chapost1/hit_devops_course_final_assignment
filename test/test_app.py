@@ -99,7 +99,7 @@ def user_session_decorator(test_function):
 
 
 @user_session_decorator
-def test_counter_value_is_zero_on_login(counter_value):
+def test_get_counter_value_works(counter_value):
     # validates that the counter value is as expected
     assert get_counter_value(driver) == counter_value
 
