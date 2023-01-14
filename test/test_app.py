@@ -17,7 +17,7 @@ from driver_operations import (
 
 
 chrome_options = Options()
-chrome_options.add_argument("--headless")
+# chrome_options.add_argument("--headless")
 chrome_options.add_argument("--start-maximized")
 
 driver = webdriver.Chrome(
