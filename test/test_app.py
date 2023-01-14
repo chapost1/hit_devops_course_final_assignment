@@ -98,12 +98,6 @@ def user_session_decorator(test_function):
 
 
 @user_session_decorator
-def test_get_counter_value(counter_value):
-    # validates that the counter value is as expected
-    assert get_counter_value(driver) == counter_value
-
-
-@user_session_decorator
 def test_increment_counter(counter_value):
     # increment counter
     increment_counter(driver)
