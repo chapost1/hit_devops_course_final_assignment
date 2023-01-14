@@ -68,8 +68,7 @@ def test_logout():
     assert is_login_container_displayed(driver) == True
 
 
-@pytest.mark.parametrize("counter_value", [0, 3, 7])
-def test_set_get_counter_value(counter_value: int):
+def test_set_get_counter_value():
     # if the counter container is not displayed, login
     if not is_counter_container_displayed(driver):
         login(driver, environment.AuthCredentials.username,
@@ -77,10 +76,10 @@ def test_set_get_counter_value(counter_value: int):
         # after login, validates that the counter container is displayed
         assert is_counter_container_displayed(driver) == True
     # set counter value to X
-    set_counter_value(driver, counter_value)
+    set_counter_value(driver, 0)
     # validates that the counter value is X
     counter_value = get_counter_value(driver)
-    assert counter_value == counter_value
+    assert counter_value == 0
 
 
 def user_session_decorator(test_function):
