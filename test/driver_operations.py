@@ -31,7 +31,7 @@ def is_authentication_error_message_displayed(driver):
 
 
 def grab_authentication_error_mesaage(driver):
-    time.sleep(0.1)
+    time.sleep(0.5)
     error_message = driver.find_element(by=By.ID, value='authentication-error')
     return error_message.text
 
